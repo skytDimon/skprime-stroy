@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: prime_stroi_web
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    # If you need to access it via HTTPS, it's recommended to place it behind a reverse proxy (like another Nginx, Traefik, or Cloudflare).
