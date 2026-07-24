@@ -7,8 +7,25 @@ services:
       dockerfile: Dockerfile
     container_name: prime_stroi_web
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
       - NODE_ENV=production
-    # If you need to access it via HTTPS, it's recommended to place it behind a reverse proxy (like another Nginx, Traefik, or Cloudflare).
+
+  caddy:
+    image: caddy:latest
+    container_name: prime_stroi_caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,4 @@
+# Замените yourdomain.ru на ваш реальный домен
+skprime-stroy.ru {
+    reverse_proxy web:80
+}
