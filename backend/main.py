@@ -47,7 +47,7 @@ async def send_telegram_notification(form: ContactForm):
     async with httpx.AsyncClient() as client:
         for chat_id in chat_ids:
             try:
-                await client.post(
+                response = await client.post(
                     url,
                     json={
                         "chat_id": chat_id,
@@ -56,6 +56,7 @@ async def send_telegram_notification(form: ContactForm):
                     },
                     timeout=10.0
                 )
+                print(f"Telegram sent to {chat_id}, status: {response.status_code}, response: {response.text}")
             except Exception as e:
                 print(f"Failed to send telegram to {chat_id}: {e}")
 
