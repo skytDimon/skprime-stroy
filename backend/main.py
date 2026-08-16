@@ -29,6 +29,7 @@ class ContactForm(BaseModel):
     name: str
     phone: str
     objectType: str
+    otherDetails: str = ""
 
 
 async def send_telegram_notification(form: ContactForm):
@@ -43,12 +44,27 @@ async def send_telegram_notification(form: ContactForm):
         print("DEBUG: NO CHAT IDS CONFIGURED")
         return
         
+    object_type_mapping = {
+        "industrial": "Промышленное здание",
+        "administrative": "Административное здание",
+        "warehouse": "Складской комплекс",
+        "infrastructure": "Инженерная инфраструктура",
+        "turnkey": "Возведение под ключ",
+        "special_works": "Отдельные виды работ",
+        "other": "Другое"
+    }
+    
+    russian_object_type = object_type_mapping.get(form.objectType, form.objectType)
+    
     text = (
         "🏗 <b>Новая заявка с сайта ПРАЙМ-СТРОЙ</b>\n\n"
         f"👤 <b>Имя:</b> {form.name}\n"
         f"📞 <b>Телефон:</b> {form.phone}\n"
-        f"🏭 <b>Что нужно:</b> {form.objectType}"
+        f"🏭 <b>Что нужно:</b> {russian_object_type}"
     )
+    
+    if form.otherDetails:
+        text += f"\n📝 <b>Доп. информация:</b> {form.otherDetails}"
 
     url = f"{TELEGRAM_API_URL}/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     
