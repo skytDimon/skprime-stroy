@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8290958205:AAEEgNb30OJYz2VOgdVipt5P0W_TZLetaBI")
-TELEGRAM_CHAT_IDS = os.getenv("TELEGRAM_CHAT_IDS", "2117749294,821740830")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_IDS = os.getenv("TELEGRAM_CHAT_IDS", "")
 
 
 app = FastAPI(
@@ -30,7 +30,9 @@ class ContactForm(BaseModel):
 
 
 async def send_telegram_notification(form: ContactForm):
+    print(f"DEBUG: Starting telegram sending for {form.name}...")
     if not TELEGRAM_BOT_TOKEN:
+        print("DEBUG: NO BOT TOKEN")
         return
 
     chat_ids = [chat_id.strip() for chat_id in TELEGRAM_CHAT_IDS.split(",") if chat_id.strip()]

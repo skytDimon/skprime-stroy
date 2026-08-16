@@ -10,8 +10,6 @@ const toggleMenu = () => { mobileMenuOpen.value = !mobileMenuOpen.value }
 /* ───── header scroll shadow ───── */
 const scrolled = ref(false)
 function onScroll() { scrolled.value = window.scrollY > 20 }
-onMounted(() => window.addEventListener('scroll', onScroll))
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
 /* ───── smooth scroll ───── */
 function scrollTo(id) {
@@ -21,6 +19,49 @@ function scrollTo(id) {
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+/* ───── stats animation ───── */
+const statsYears = ref(0)
+const statsObjects = ref(0)
+const statsViolations = ref(0)
+const statsSectionRef = ref(null)
+
+let hasAnimated = false
+
+function animateValue(obj, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    let progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    
+    obj.value = Math.floor(progress * (end - start) + start);
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll)
+  
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !hasAnimated) {
+      hasAnimated = true;
+      animateValue(statsYears, 0, 8, 1500);
+      animateValue(statsObjects, 0, 50, 1500);
+      // violations stays 0, no need to animate
+    }
+  }, { threshold: 0.2 });
+  
+  if (statsSectionRef.value) {
+    observer.observe(statsSectionRef.value);
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+})
 
 /* ───── contact form ───── */
 const form = ref({ name: '', phone: '', objectType: '', otherDetails: '' })
@@ -86,7 +127,8 @@ const services = [
         <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span>Благоустройство территории</span></li>
       </ul>
     `,
-    images: ['11.png']
+    coverImage: '1.jpg',
+    images: []
   },
   {
     title: 'Проектирование',
@@ -140,7 +182,8 @@ const services = [
       
       <p class="mt-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 italic">Мы гарантируем, что привлечение наших проверенных партнеров по проектированию позволит вам получить не просто здание, а идеально спроектированное пространство, максимально отвечающее вашим производственным, логистическим или административным задачам.</p>
     `,
-    images: ['22.png']
+    coverImage: 'background.jpg',
+    images: []
   },
   {
     title: 'Организация строительной площадки',
@@ -201,7 +244,8 @@ const services = [
         <li class="flex items-start gap-3"><span class="text-teal-500 mt-1 font-bold">✓</span> <span><b>Качество строительства:</b> Правильная разбивка и планировка – основа для точного возведения.</span></li>
       </ul>
     `,
-    images: ['33.png']
+    coverImage: '3.jpg',
+    images: []
   },
   {
     title: 'Фундаменты',
@@ -251,7 +295,8 @@ const services = [
         <span class="px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold">Гидроизоляция</span>
       </div>
     `,
-    images: ['44.png']
+    coverImage: '2.png',
+    images: ['2.png']
   },
   {
     title: 'Металлические и железобетонные каркасы',
@@ -295,7 +340,8 @@ const services = [
         </div>
       </div>
     `,
-    images: ['55.png']
+    coverImage: '3.jpg',
+    images: ['3.jpg']
   },
   {
     title: 'Ограждающие конструкции',
@@ -330,7 +376,8 @@ const services = [
         </div>
       </div>
     `,
-    images: ['11.png']
+    coverImage: '6.jpg',
+    images: []
   },
   {
     title: 'Промышленные полы',
@@ -368,7 +415,8 @@ const services = [
       <p class="font-bold text-neutral-900 mt-6 mb-2">Этапы устройства полов:</p>
       <p class="text-neutral-600">Подготовка основания, устройство гидроизоляции, укладка утеплителя и арматуры, заливка бетона с финишной обработкой (втирание топпинга или заливка полимерного состава), нарезка швов.</p>
     `,
-    images: ['22.png']
+    coverImage: '4.jpg',
+    images: ['44.jpg']
   },
   {
     title: 'Инженерные сети',
@@ -411,7 +459,9 @@ const services = [
       
       <p class="mt-10 p-6 bg-teal-50/50 rounded-2xl border border-teal-100 text-teal-900 text-sm">Проектирование и монтаж инженерных сетей требуют глубоких знаний и строгого соблюдения строительных норм и правил (СНиП, ГОСТ, СП). Комплексное проектирование является залогом надежной и эффективной работы здания.</p>
     `,
-    images: ['33.png']
+    coverImage: '5.png',
+    images: ['55.png'],
+    bgPosition: 'center 60%'
   }
 ]
 </script>
@@ -419,7 +469,7 @@ const services = [
 <template>
   <div class="relative min-h-screen text-neutral-900 antialiased" style="font-family: 'Inter', system-ui, sans-serif;">
     <!-- background image -->
-    <div class="fixed inset-0 z-0 pointer-events-none" style="background: url('/background.png') center / cover no-repeat fixed;"></div>
+    <div class="fixed inset-0 z-0 pointer-events-none" style="background: url('/background.jpg') center / cover no-repeat fixed;"></div>
 
     <!-- ══════════ HEADER ══════════ -->
     <header
@@ -435,7 +485,7 @@ const services = [
 
           <!-- logo -->
           <button @click="scrollToTop" class="flex items-end gap-4 shrink-0 cursor-pointer text-left">
-            <img src="/logo.png" alt="ПРАЙМ-СТРОЙ" class="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl object-contain" />
+            <img src="/logo.png" alt="ПРАЙМ-СТРОЙ" loading="lazy" class="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl object-contain" />
             <div class="hidden md:block mb-7 lg:mb-7">
               <span class="block text-xs lg:text-sm tracking-[0.2em] uppercase text-neutral-400">строительная компания</span>
             </div>
@@ -496,8 +546,7 @@ const services = [
 
     <!-- ══════════ HERO ══════════ -->
     <section class="relative z-[1] min-h-screen flex items-center overflow-hidden">
-      <!-- Gradient overlay for text readability -->
-      <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent sm:w-2/3 lg:w-3/4 pointer-events-none z-0"></div>
+
 
       <div class="relative w-full max-w-[1400px] mx-auto px-6 lg:px-10 py-36 lg:py-44 z-10">
         <div class="max-w-4xl">
@@ -508,7 +557,7 @@ const services = [
 
           <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight text-neutral-900">
             Строим промышленные<br/>объекты
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600"> точно в&nbsp;срок</span>
+            <span class="text-teal-600"> точно в&nbsp;срок</span>
           </h1>
 
           <p class="mt-8 lg:mt-10 text-lg lg:text-xl leading-relaxed max-w-3xl text-neutral-800 font-medium">
@@ -531,17 +580,17 @@ const services = [
           </div>
 
           <!-- stats -->
-          <div class="mt-16 lg:mt-20 grid grid-cols-3 gap-8 lg:gap-12 max-w-xl">
+          <div ref="statsSectionRef" class="mt-16 lg:mt-20 grid grid-cols-3 gap-8 lg:gap-12 max-w-xl">
             <div>
-              <div class="text-4xl lg:text-5xl font-black text-neutral-900">8+</div>
+              <div class="text-5xl lg:text-6xl font-black text-neutral-900 tracking-tight">{{ statsYears }}+</div>
               <div class="text-sm lg:text-base mt-2 text-neutral-400">лет на рынке</div>
             </div>
             <div>
-              <div class="text-4xl lg:text-5xl font-black text-neutral-900">50+</div>
+              <div class="text-5xl lg:text-6xl font-black text-neutral-900 tracking-tight">{{ statsObjects }}+</div>
               <div class="text-sm lg:text-base mt-2 text-neutral-400">объектов сдано</div>
             </div>
-            <div>
-              <div class="text-4xl lg:text-5xl font-black text-neutral-900">0</div>
+            <div class="col-span-2 md:col-span-1 text-center md:text-left mt-4 md:mt-0">
+              <div class="text-5xl lg:text-6xl font-black text-neutral-900 tracking-tight">{{ statsViolations }}</div>
               <div class="text-sm lg:text-base mt-2 text-neutral-400">нарушений ТБ</div>
             </div>
           </div>
@@ -557,20 +606,20 @@ const services = [
     <section id="about" class="relative z-[1] py-24 lg:py-32">
       <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
         <div class="max-w-5xl">
-          <div>
+          <div v-fade-in style="text-shadow: 0 0 15px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,1);">
             <span class="text-sm lg:text-base font-bold tracking-[0.2em] uppercase text-teal-600">О компании</span>
             <h2 class="mt-4 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-neutral-900">
-              Надёжный <span class="text-teal-600">генеральный подрядчик</span><br class="hidden lg:block"/>
+              Надёжный <span class="text-teal-600" style="text-shadow: 0 0 15px rgba(255,255,255,1);">генеральный подрядчик</span><br class="hidden lg:block"/>
               для промышленного строительства под&nbsp;ключ
             </h2>
-            <p class="mt-8 text-lg leading-relaxed text-neutral-600 font-medium">
+            <p class="mt-8 text-base sm:text-lg leading-relaxed text-neutral-800 font-semibold">
               Строительная компания «ПРАЙМ-СТРОЙ» - это динамично развивающаяся строительная компания, специализирующаяся на возведении логистических комплексов, промышленных и административных зданий и сооружений любой сложности. Мы объединяем многолетний опыт, передовые технологии и команду высококвалифицированных профессионалов, чтобы предложить нашим клиентам комплексные решения – от проектирования до сдачи объекта "под ключ".
             </p>
             
             <div class="mt-8 space-y-8">
               <div>
                 <h3 class="text-xl font-bold text-neutral-900 mb-4">Что нас отличает:</h3>
-                <ul class="space-y-3 text-neutral-600">
+                <ul class="space-y-3 text-neutral-800 font-medium">
                   <li class="flex items-start gap-3"><span class="text-teal-600 font-bold mt-0.5">✓</span> <span><b>Комплексный подход:</b> полный цикл строительных работ, включая подготовку, СМР, сети и благоустройство.</span></li>
                   <li class="flex items-start gap-3"><span class="text-teal-600 font-bold mt-0.5">✓</span> <span><b>Опыт и экспертиза:</b> команда из опытных инженеров, строителей и менеджеров проектов.</span></li>
                   <li class="flex items-start gap-3"><span class="text-teal-600 font-bold mt-0.5">✓</span> <span><b>Современные технологии:</b> инновационные материалы для оптимизации сроков и энергоэффективности.</span></li>
@@ -582,7 +631,7 @@ const services = [
 
               <div>
                 <h3 class="text-xl font-bold text-neutral-900 mb-4">Наши ключевые направления:</h3>
-                <ul class="space-y-2 text-neutral-600">
+                <ul class="space-y-2 text-neutral-800 font-medium">
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Возведение складских комплексов и логистических центров</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Строительство офисных зданий и бизнес-центров</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Создание торговых комплексов и выставочных павильонов</span></li>
@@ -601,12 +650,12 @@ const services = [
     <!-- ══════════ SERVICES ══════════ -->
     <section id="services" class="relative z-[1] py-24 lg:py-32">
       <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
-        <div class="text-center mb-16 lg:mb-20">
+        <div v-fade-in class="text-center mb-16 lg:mb-20" style="text-shadow: 0 0 15px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,1);">
           <span class="text-sm lg:text-base font-bold tracking-[0.2em] uppercase text-teal-600">Компетенции</span>
           <h2 class="mt-4 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-900">
             Комплексные решения<br class="hidden sm:block"/> для&nbsp;вашего объекта
           </h2>
-          <p class="mt-6 max-w-3xl mx-auto text-lg text-neutral-500">
+          <p class="mt-6 max-w-3xl mx-auto text-lg text-neutral-800 font-semibold">
             Выполняем весь спектр строительно-монтажных работ собственными аттестованными бригадами. Каждый этап — под контролем ИТР и с оформлением исполнительной документации.
           </p>
         </div>
@@ -616,11 +665,12 @@ const services = [
             v-for="(s, i) in services"
             :key="i"
             @click="selectedService = s"
-            class="group relative bg-white border-2 border-neutral-200 rounded-3xl overflow-hidden shadow-lg hover:shadow-teal-900/10 hover:border-teal-400/60 hover:-translate-y-2 transition-all duration-300 cursor-pointer min-h-[420px] flex flex-col justify-end"
-            :class="{ 'md:col-span-2 xl:col-span-3': i === 0 }"
+            class="group relative bg-white border-2 border-neutral-200 rounded-3xl overflow-hidden shadow-lg hover:shadow-teal-900/10 hover:border-teal-400/60 hover:-translate-y-2 transition-all duration-300 cursor-pointer min-h-[350px] md:min-h-[420px] flex flex-col justify-end"
+            :class="{ 'md:col-span-2 xl:col-span-3': i === 0 || i === 7 }"
+            v-fade-in
           >
             <!-- background image -->
-            <div class="absolute inset-0 z-0 bg-cover bg-top transition-transform duration-700 group-hover:scale-105" :style="{ backgroundImage: `url('/${i + 1}.png')` }"></div>
+            <div class="absolute inset-0 z-0 bg-cover transition-transform duration-700 group-hover:scale-105" :style="{ backgroundImage: `url('/${s.coverImage}')`, backgroundPosition: s.bgPosition || 'top' }"></div>
 
             <!-- gradient for text readability -->
             <div class="absolute inset-0 z-0 bg-gradient-to-t from-white via-white/80 to-transparent"></div>
@@ -646,7 +696,7 @@ const services = [
       <div class="relative max-w-[1400px] mx-auto px-6 lg:px-10">
         <div class="grid lg:grid-cols-2 gap-16 lg:gap-20">
           <!-- left: info -->
-          <div>
+          <div v-fade-in>
             <span class="text-sm lg:text-base font-bold tracking-[0.2em] uppercase text-teal-600">Связаться с нами</span>
             <h2 class="mt-4 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-900">Обсудим ваш проект</h2>
             <p class="mt-8 text-lg leading-relaxed text-neutral-500">
@@ -693,7 +743,7 @@ const services = [
           </div>
 
           <!-- right: form -->
-          <div class="bg-white border-2 border-neutral-200 rounded-3xl p-8 lg:p-10 shadow-xl shadow-neutral-200/50">
+          <div v-fade-in class="bg-white border-2 border-neutral-200 rounded-3xl p-8 lg:p-10 shadow-xl shadow-neutral-200/50">
 
             <!-- success state -->
             <div v-if="sent" class="text-center py-16">
@@ -850,10 +900,16 @@ const services = [
                 <span class="text-sm text-neutral-500">2BM-6671347890-667101001-202512220800083840444</span>
               </li>
             </ul>
-            <a href="/requisites.docx" download class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-teal-600/10 text-teal-400 hover:bg-teal-600/20 transition-all border border-teal-600/20">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Скачать реквизиты
-            </a>
+            <div class="flex flex-col gap-3 items-start">
+              <a href="/req1.docx" download class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-teal-600/10 text-teal-400 hover:bg-teal-600/20 transition-all border border-teal-600/20">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Скачать реквизиты
+              </a>
+              <a href="/req.pdf" target="_blank" download="Выписка_СРО_ПРАЙМ-СТРОЙ.pdf" class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-teal-600/10 text-teal-400 hover:bg-teal-600/20 transition-all border border-teal-600/20">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Выписка из СРО
+              </a>
+            </div>
           </div>
         </div>
 
@@ -883,53 +939,31 @@ const services = [
         </button>
 
         <!-- Modal Content Container -->
-        <div class="w-full h-full overflow-y-auto p-6 md:p-10 lg:p-16 bg-white relative">
+        <div class="w-full h-full overflow-y-auto p-6 md:p-10 lg:p-16 bg-white relative flex flex-col">
           
-          <!-- Desktop Floating Block (Image + CTA) -->
-          <div class="hidden lg:flex lg:w-[45%] lg:float-right lg:ml-12 lg:mb-10 flex-col gap-8 clear-right">
-            <div v-if="selectedService.images && selectedService.images.length" class="flex flex-col gap-6">
-              <img v-for="img in selectedService.images" :key="img" :src="'/' + img" class="w-full rounded-2xl object-cover shadow-2xl" alt="Фото работ" />
-            </div>
-            
-            <div class="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100 rounded-3xl p-8 text-center shadow-xl">
-              <h3 class="text-2xl font-bold text-neutral-900 mb-3">Готовы обсудить проект?</h3>
-              <p class="text-neutral-600 mb-8 text-sm leading-relaxed">Оставьте заявку, и наши инженеры свяжутся с вами для расчёта стоимости и сроков.</p>
-              <button
-                @click="closeModalAndScrollToContact"
-                class="w-full py-5 text-lg font-bold rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-xl shadow-teal-600/25 hover:shadow-teal-600/40 hover:-translate-y-1 transition-all duration-300"
-              >
-                Оставить заявку
-              </button>
-            </div>
-          </div>
-
           <!-- Text content -->
-          <div class="w-full">
-            <h2 class="text-4xl lg:text-5xl font-black text-neutral-900 mb-8 lg:mb-12 leading-tight max-w-2xl">{{ selectedService.title }}</h2>
+          <div class="w-full flex-grow">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-neutral-900 mb-8 lg:mb-10 leading-tight max-w-4xl">{{ selectedService.title }}</h2>
             
-            <!-- Mobile Image (Hidden on Desktop) -->
-            <div class="lg:hidden w-full mb-10 flex flex-col gap-6">
-              <img v-if="selectedService.images && selectedService.images.length" :src="'/' + selectedService.images[0]" class="w-full rounded-3xl object-cover shadow-xl" alt="Фото работ" />
+            <!-- Image -->
+            <div class="w-full mb-8 sm:mb-10">
+              <img v-if="selectedService.images && selectedService.images.length" :src="'/' + selectedService.images[0]" loading="lazy" class="w-full max-h-[250px] sm:max-h-[400px] lg:max-h-[500px] rounded-3xl object-cover shadow-xl" alt="Фото работ" />
             </div>
 
             <!-- Descriptive Text -->
-            <div class="text-lg leading-relaxed text-neutral-600 max-w-none" v-html="selectedService.detailedDesc || selectedService.desc"></div>
+            <div class="text-base sm:text-lg leading-relaxed text-neutral-600 max-w-none" v-html="selectedService.detailedDesc || selectedService.desc"></div>
           </div>
 
-          <!-- Mobile CTA (Hidden on Desktop) -->
-          <div class="lg:hidden mt-12 bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100 rounded-3xl p-8 text-center shadow-xl">
-            <h3 class="text-2xl font-bold text-neutral-900 mb-3">Готовы обсудить проект?</h3>
-            <p class="text-neutral-600 mb-8 text-sm leading-relaxed">Оставьте заявку, и наши инженеры свяжутся с вами для расчёта стоимости и сроков.</p>
+          <!-- Bottom CTA Button (Right aligned) -->
+          <div class="mt-12 flex justify-end">
             <button
               @click="closeModalAndScrollToContact"
-              class="w-full py-5 text-lg font-bold rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-xl shadow-teal-600/25 hover:shadow-teal-600/40 hover:-translate-y-1 transition-all duration-300"
+              class="w-full sm:w-auto px-10 py-5 text-lg font-bold rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-xl shadow-teal-600/25 hover:shadow-teal-600/40 hover:-translate-y-1 transition-all duration-300"
             >
               Оставить заявку
             </button>
           </div>
           
-          <!-- Clearfix to ensure container wraps floated element -->
-          <div class="clear-both"></div>
         </div>
 
       </div>

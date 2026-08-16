@@ -9,6 +9,8 @@ services:
     restart: always
     expose:
       - "80"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
 
