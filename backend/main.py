@@ -49,7 +49,7 @@ async def send_telegram_notification(form: ContactForm):
         "administrative": "Административное здание",
         "warehouse": "Складской комплекс",
         "infrastructure": "Инженерная инфраструктура",
-        "turnkey": "Возведение под ключ",
+        "turnkey": "Возведение «под ключ»",
         "special_works": "Отдельные виды работ",
         "other": "Другое"
     }

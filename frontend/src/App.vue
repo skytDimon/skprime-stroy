@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const currentYear = new Date().getFullYear()
 
@@ -70,6 +70,15 @@ const sent = ref(false)
 const error = ref('')
 
 const selectedService = ref(null)
+const mapModalOpen = ref(false)
+
+watch([selectedService, mapModalOpen], ([newService, newMap]) => {
+  if (newService || newMap) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 
 function closeModalAndScrollToContact() {
   if (selectedService.value) {
@@ -109,7 +118,7 @@ async function submitForm() {
 const services = [
   {
     title: 'Промышленные и административные здания',
-    desc: 'Полный цикл строительства объектов промышленного и административного назначения — от нулевого цикла до сдачи под ключ.',
+    desc: 'Полный цикл строительства объектов промышленного и административного назначения — от нулевого цикла до сдачи «под ключ».',
     detailedDesc: `
       <p class="mb-6 text-2xl text-neutral-900 font-bold leading-snug">Мы выполняем полный цикл строительства складских, промышленных и административных объектов.</p>
       <p class="mb-6">Наши компетенции охватывают следующие виды работ и услуг:</p>
@@ -153,7 +162,7 @@ const services = [
           <ul class="list-none space-y-3 mt-4">
             <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Архитектурное проектирование:</b> Разработка концепции, эскизных проектов, рабочих чертежей фасадов, планировок, интерьеров.</span></li>
             <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Конструктивные решения:</b> Проектирование несущих и ограждающих конструкций, фундаментов, каркасов зданий, расчет нагрузок.</span></li>
-            <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Инженерные системы:</b> Проектирование систем отопления, вентиляции, водоснабжения, электроснабжения и слаботочных систем.</span></li>
+            <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Инженерные системы:</b> Проектирование систем отопления, вентиляции и кондиционирования (ОВК), водоснабжения и канализации (ВК), электроснабжения (ЭОМ), слаботочных систем (СС), систем автоматизации и диспетчеризации.</span></li>
             <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Проектирование технологических процессов:</b> Разработка схем размещения оборудования, планировок производственных зон.</span></li>
             <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Разработка документации:</b> Подготовка полного пакета документов для согласования и строительства.</span></li>
             <li class="flex items-start gap-3"><span class="text-teal-500 mt-1">▪</span> <span><b>Авторский надзор:</b> Сопровождение строительства для обеспечения соответствия работ проекту.</span></li>
@@ -161,11 +170,11 @@ const services = [
         </li>
         <li>
           <b class="text-neutral-900 block mb-2 text-lg">Оптимизация сроков и бюджета</b>
-          Благодаря слаженной работе нашей строительной компании и проектных партнеров, процесс от идеи до реализации становится более быстрым и предсказуемым.
+          Благодаря слаженной работе нашей строительной компании и проектных партнеров, процесс от идеи до реализации становится более быстрым и предсказуемым. Мы можем оптимизировать проектные решения с учетом строительных возможностей и бюджета клиента.
         </li>
         <li>
           <b class="text-neutral-900 block mb-2 text-lg">Индивидуальный подход</b>
-          Мы вместе с нашими партнерами внимательно изучаем потребности каждого клиента, специфику его бизнеса и требования к будущему объекту.
+          Мы вместе с нашими партнерами внимательно изучаем потребности каждого клиента, специфику его бизнеса и требования к будущему объекту, чтобы предложить наиболее эффективные проектные решения.
         </li>
       </ul>
       
@@ -182,7 +191,7 @@ const services = [
       
       <p class="mt-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 italic">Мы гарантируем, что привлечение наших проверенных партнеров по проектированию позволит вам получить не просто здание, а идеально спроектированное пространство, максимально отвечающее вашим производственным, логистическим или административным задачам.</p>
     `,
-    coverImage: 'background.jpg',
+    coverImage: 'prok.jpg',
     images: []
   },
   {
@@ -244,7 +253,7 @@ const services = [
         <li class="flex items-start gap-3"><span class="text-teal-500 mt-1 font-bold">✓</span> <span><b>Качество строительства:</b> Правильная разбивка и планировка – основа для точного возведения.</span></li>
       </ul>
     `,
-    coverImage: '3.jpg',
+    coverImage: 'POS.jpg',
     images: []
   },
   {
@@ -278,7 +287,7 @@ const services = [
       <p class="mb-6 text-xl font-bold text-neutral-900">Виды фундаментов:</p>
       <ul class="space-y-4 mb-8 text-neutral-600">
         <li><b class="text-neutral-900">Ленточные:</b> Бетонные ленты под несущими стенами и колоннами.</li>
-        <li><b class="text-neutral-900">Столбчатые:</b> Отдельные столбы с ростверком. Для облегченных конструкций.</li>
+        <li><b class="text-neutral-900">Столбчатые:</b> Отдельные столбы, заглубленные в грунт. Для облегченных конструкций и для точечных нагрузок.</li>
         <li><b class="text-neutral-900">Плитные:</b> Сплошная ж/б плита под всем зданием. Идеальны для слабых грунтов.</li>
         <li><b class="text-neutral-900">Свайные:</b> Забивные или винтовые сваи до несущего слоя грунта.</li>
         <li><b class="text-neutral-900">Под оборудование:</b> Специальные конструкции для вибрационных нагрузок.</li>
@@ -354,8 +363,8 @@ const services = [
       <div class="space-y-6">
         <div class="border-b border-neutral-100 pb-6">
           <p class="font-black text-xl text-neutral-900 mb-2">Сэндвич-панели</p>
-          <p class="mb-4 text-neutral-600 text-sm">Трехслойные панели, состоящие из двух слоев облицовки и утеплителя (минвата, ПИР, ПУР).</p>
-          <p class="text-neutral-600 text-sm"><b class="text-neutral-800">Плюсы:</b> Быстрый монтаж, высокая теплоизоляция, долговечность, эстетика.</p>
+          <p class="mb-4 text-neutral-600 text-sm">Трехслойные панели, состоящие из двух слоев облицовки и утеплителя (минвата, ППС, ППУ).</p>
+          <p class="text-neutral-600 text-sm"><b class="text-neutral-800">Плюсы:</b> Быстрый монтаж, высокая теплоизоляция, долговечность, эстетика, пожарная безопасность.</p>
         </div>
 
         <div class="border-b border-neutral-100 pb-6">
@@ -376,7 +385,7 @@ const services = [
         </div>
       </div>
     `,
-    coverImage: '6.jpg',
+    coverImage: 'ogr.png',
     images: []
   },
   {
@@ -609,11 +618,11 @@ const services = [
           <div v-fade-in style="text-shadow: 0 0 15px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,1);">
             <span class="text-sm lg:text-base font-bold tracking-[0.2em] uppercase text-teal-600">О компании</span>
             <h2 class="mt-4 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-neutral-900">
-              Надёжный <span class="text-teal-600" style="text-shadow: 0 0 15px rgba(255,255,255,1);">генеральный подрядчик</span><br class="hidden lg:block"/>
-              для промышленного строительства под&nbsp;ключ
+              Надёжный <span class="text-[#009ca6]" style="text-shadow: 0 0 15px rgba(255,255,255,1);">генеральный подрядчик</span><br class="hidden lg:block"/>
+              для промышленного строительства «под&nbsp;ключ»
             </h2>
             <p class="mt-8 text-base sm:text-lg leading-relaxed text-neutral-800 font-semibold">
-              Строительная компания «ПРАЙМ-СТРОЙ» - это динамично развивающаяся строительная компания, специализирующаяся на возведении логистических комплексов, промышленных и административных зданий и сооружений любой сложности. Мы объединяем многолетний опыт, передовые технологии и команду высококвалифицированных профессионалов, чтобы предложить нашим клиентам комплексные решения – от проектирования до сдачи объекта "под ключ".
+              Строительная компания «ПРАЙМ-СТРОЙ» - это динамично развивающаяся строительная компания, специализирующаяся на возведении логистических комплексов, промышленных и административных зданий и сооружений любой сложности. Мы объединяем многолетний опыт, передовые технологии и команду высококвалифицированных профессионалов, чтобы предложить нашим клиентам комплексные решения – от проектирования до сдачи объекта «под ключ».
             </p>
             
             <div class="mt-8 space-y-8">
@@ -630,12 +639,13 @@ const services = [
               </div>
 
               <div>
-                <h3 class="text-xl font-bold text-neutral-900 mb-4">Наши ключевые направления:</h3>
+                <h3 class="text-2xl font-black text-[#009ca6] mb-5">Наши ключевые направления:</h3>
                 <ul class="space-y-2 text-neutral-800 font-medium">
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Возведение складских комплексов и логистических центров</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Строительство офисных зданий и бизнес-центров</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Создание торговых комплексов и выставочных павильонов</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Реконструкция и модернизация промышленных и административных объектов</span></li>
+                  <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Устройство фундаментов любой сложности</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Монтаж металлоконструкций и ограждающих конструкций</span></li>
                   <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2.5 shrink-0"></span> <span>Устройство промышленных полов и монтаж инженерных сетей</span></li>
                 </ul>
@@ -656,7 +666,7 @@ const services = [
             Комплексные решения<br class="hidden sm:block"/> для&nbsp;вашего объекта
           </h2>
           <p class="mt-6 max-w-3xl mx-auto text-lg text-neutral-800 font-semibold">
-            Выполняем весь спектр строительно-монтажных работ собственными аттестованными бригадами. Каждый этап — под контролем ИТР и с оформлением исполнительной документации.
+            Комплексно выполняем весь спектр строительно-монтажных работ. Также можем выполнить отдельные виды и этапы работ. Каждый этап – под контролем ответственных ИТР и с оформлением исполнительной документации.
           </p>
         </div>
 
@@ -710,7 +720,7 @@ const services = [
                 </div>
                 <div>
                   <div class="font-bold text-lg text-neutral-900">Адрес</div>
-                  <div class="text-base mt-1 text-neutral-500">г.&nbsp;Екатеринбург, ул.&nbsp;Барвинка,&nbsp;21, офис&nbsp;35</div>
+                  <div class="text-base mt-1 text-neutral-500 hover:text-teal-600 transition-colors cursor-pointer" @click="mapModalOpen = true" title="Показать на карте">г.&nbsp;Екатеринбург, ул.&nbsp;Барвинка,&nbsp;21, офис&nbsp;35</div>
                 </div>
               </div>
 
@@ -798,7 +808,7 @@ const services = [
                   <option value="administrative">Административное здание</option>
                   <option value="warehouse">Складской комплекс</option>
                   <option value="infrastructure">Инженерная инфраструктура</option>
-                  <option value="turnkey">Возведение под ключ</option>
+                  <option value="turnkey">Возведение «под ключ»</option>
                   <option value="special_works">Отдельные виды работ</option>
                   <option value="other">Другое</option>
                 </select>
@@ -815,7 +825,7 @@ const services = [
                 />
               </div>
 
-              <div v-if="form.objectType === 'special_works' || form.objectType === 'other'">
+              <div v-if="form.objectType === 'special_works' || form.objectType === 'other' || form.objectType === 'infrastructure'">
                 <label for="otherDetails" class="block text-base font-semibold text-neutral-700 mb-2">Опишите, что именно нужно</label>
                 <input
                   id="otherDetails"
@@ -870,7 +880,7 @@ const services = [
                 <a href="mailto:info@skprime-stroy.ru" class="hover:text-teal-400 transition-colors text-white">info@skprime-stroy.ru</a>
                 <a href="mailto:office.prime-stroy@ya.ru" class="hover:text-teal-400 transition-colors text-sm">office.prime-stroy@ya.ru</a>
               </li>
-              <li>г.&nbsp;Екатеринбург, ул.&nbsp;Барвинка,&nbsp;21, оф.&nbsp;35</li>
+              <li class="cursor-pointer hover:text-teal-500 transition-colors" @click="mapModalOpen = true" title="Показать на карте">г.&nbsp;Екатеринбург, ул.&nbsp;Барвинка,&nbsp;21, оф.&nbsp;35</li>
             </ul>
           </div>
 
@@ -901,9 +911,9 @@ const services = [
               </li>
             </ul>
             <div class="flex flex-col gap-3 items-start">
-              <a href="/req1.docx" download class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-teal-600/10 text-teal-400 hover:bg-teal-600/20 transition-all border border-teal-600/20">
+              <a href="/req1.docx" download="Карточка компании.docx" class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-teal-600/10 text-teal-400 hover:bg-teal-600/20 transition-all border border-teal-600/20">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                Скачать реквизиты
+                Скачать карточку компании
               </a>
               <a href="/req.pdf" target="_blank" download="Выписка_СРО_ПРАЙМ-СТРОЙ.pdf" class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-teal-600/10 text-teal-400 hover:bg-teal-600/20 transition-all border border-teal-600/20">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -969,4 +979,46 @@ const services = [
       </div>
     </div>
   </transition>
+  <!-- ══════════ MAP MODAL ══════════ -->
+  <Transition
+    enter-active-class="transition-opacity duration-300"
+    enter-from-class="opacity-0"
+    leave-active-class="transition-opacity duration-300"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="mapModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-900/50 backdrop-blur-sm" @click.self="mapModalOpen = false">
+      <div class="relative w-full max-w-md bg-neutral-50 rounded-3xl shadow-2xl p-8 text-center flex flex-col items-center">
+        <!-- Close button -->
+        <button @click="mapModalOpen = false" class="absolute top-4 right-4 z-50 w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-200 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <!-- Content -->
+        <h3 class="text-3xl font-bold text-teal-600 mb-6 uppercase tracking-wide">Прайм-Строй</h3>
+        
+        <div class="text-lg text-neutral-800 mb-2 font-medium">Адрес офиса:</div>
+        <div class="text-neutral-600 mb-8 text-base">г. Екатеринбург<br/>ул. Барвинка, 21, оф. 35</div>
+        
+        <!-- Main Button -->
+        <a href="https://yandex.ru/maps/?text=Екатеринбург,+ул.+Барвинка,+21" target="_blank" rel="noopener noreferrer" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-xl transition-colors mb-4 shadow-md shadow-teal-500/30">
+          Открыть карту
+        </a>
+        
+        <!-- Secondary Buttons -->
+        <div class="flex w-full gap-3">
+          <a href="https://yandex.ru/maps/?rtext=~Екатеринбург,+ул.+Барвинка,+21" target="_blank" rel="noopener noreferrer" class="flex-1 border border-teal-500 text-teal-600 hover:bg-teal-50 font-semibold py-2.5 px-2 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
+            <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Как добраться
+          </a>
+          <a href="https://2gis.ru/ekaterinburg/search/Екатеринбург%2C%20ул.%20Барвинка%2C%2021" target="_blank" rel="noopener noreferrer" class="flex-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-100 font-semibold py-2.5 px-2 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
+            <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            Маршрут
+          </a>
+        </div>
+      </div>
+    </div>
+  </Transition>
+
 </template>
